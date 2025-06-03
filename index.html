@@ -12,13 +12,31 @@
             <h1>Tic Tac Toe</h1>
         </header>
 
+        <section class="game-mode-selection">
+            <h2>Select Game Mode</h2>
+            <div class="mode-buttons">
+                <button id="vs-human" class="mode-btn active">vs Human</button>
+                <button id="vs-ai" class="mode-btn">vs AI</button>
+            </div>
+            
+            <div class="ai-settings" style="display: none;">
+                <h3>AI Difficulty</h3>
+                <div class="difficulty-buttons">
+                    <button class="difficulty-btn" data-difficulty="easy">Easy</button>
+                    <button class="difficulty-btn" data-difficulty="medium">Medium</button>
+                    <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+                    <button class="difficulty-btn" data-difficulty="impossible">Impossible</button>
+                </div>
+            </div>
+        </section>
+
         <section class="player-setup">
             <div class="player-inputs">
                 <div class="input-group">
                     <label for="player1">Player 1 (X)</label>
                     <input type="text" id="player1" placeholder="Enter name" value="Player 1">
                 </div>
-                <div class="input-group">
+                <div class="input-group" id="player2-group">
                     <label for="player2">Player 2 (O)</label>
                     <input type="text" id="player2" placeholder="Enter name" value="Player 2">
                 </div>
@@ -27,7 +45,7 @@
         </section>
 
         <section class="game-status">
-            <p id="status-display">Enter player names and click Start Game</p>
+            <p id="status-display">Select game mode and enter player names</p>
         </section>
 
         <section class="game-board">
