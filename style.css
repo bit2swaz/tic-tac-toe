@@ -5,6 +5,7 @@
     --hover-color: #2a2a2a;
     --accent-color: #4a4a4a;
     --cell-size: 100px;
+    --footer-border: #2d2d2d;
 }
 
 * {
@@ -139,4 +140,64 @@ button:hover {
 
 #restart-game:hover {
     opacity: 1;
+}
+
+/* Footer Styles */
+.footer-section {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--footer-border);
+}
+
+footer {
+    font-size: 0.9rem;
+    color: #888;
+    transition: color 0.3s ease;
+}
+
+footer:hover {
+    color: var(--text-color);
+}
+
+footer .heart {
+    color: #ff6b6b;
+    display: inline-block;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+footer a {
+    color: #6c8bff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+footer a:hover {
+    color: #8ca3ff;
+    background-color: rgba(108, 139, 255, 0.1);
+}
+
+/* Heartbeat Animation */
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .footer-section {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+    }
+
+    footer {
+        font-size: 0.85rem;
+    }
 }
