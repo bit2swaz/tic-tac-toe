@@ -23,7 +23,7 @@ const Player = (name, marker) => {
 };
 
 // Game Controller Module
-const GameController = (() => {
+window.GameController = (() => {
     let player1;
     let player2;
     let currentPlayer;
@@ -112,8 +112,9 @@ const GameController = (() => {
     };
 })();
 
-// Example usage in console:
-// GameController.initialize("Alice", "Bob")
-// GameController.makeMove(4) // Places marker at center
-// GameController.makeMove(0) // Places marker at top-left
-// etc...
+// Print instructions when the script loads
+console.log("Welcome to Tic Tac Toe!");
+console.log("To start a new game, type: GameController.initialize('Player1', 'Player2')");
+console.log("To make a move, type: GameController.makeMove(position) where position is 0-8");
+console.log("Board positions are numbered like this:");
+console.log("\n 0 | 1 | 2 \n---+---+---\n 3 | 4 | 5 \n---+---+---\n 6 | 7 | 8 \n");
