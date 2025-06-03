@@ -263,6 +263,7 @@ const GameController = (() => {
     let aiDifficulty = 'medium';
 
     const initialize = (p1Name = "Player 1", p2Name = "Player 2", vsAI = false, difficulty = 'medium') => {
+        console.log('Initializing game:', { vsAI, difficulty }); // Debug log
         player1 = Player(p1Name || "Player 1", "X");
         player2 = Player(p2Name || "AI", "O");
         currentPlayer = player1;
@@ -277,6 +278,7 @@ const GameController = (() => {
 
     const switchPlayer = () => {
         currentPlayer = currentPlayer === player1 ? player2 : player1;
+        console.log('Switched to:', currentPlayer.name); // Debug log
     };
 
     const getWinningPattern = () => {
@@ -305,13 +307,58 @@ const GameController = (() => {
     };
 
     const makeAIMove = () => {
+        console.log('AI attempting to make move...'); // Debug log
+        console.log('Current game state:', { 
+            isVsAI, 
+            aiDifficulty, 
+            gameActive, 
+            currentPlayer: currentPlayer.name,
+            board: Gameboard.getBoard()
+        });
+
         const aiMove = AI.makeMove(aiDifficulty);
-        if (aiMove !== null) {
-            makeMove(aiMove);
+        console.log('AI chose position:', aiMove); // Debug log
+
+        if (aiMove !== null && aiMove !== undefined) {
+            if (Gameboard.updateBoard(aiMove, currentPlayer.marker)) {
+                console.log('AI move successful at position:', aiMove); // Debug log
+                DisplayController.updateBoard();
+
+                const winningPattern = getWinningPattern();
+                if (winningPattern) {
+                    DisplayController.highlightWinningCells(winningPattern);
+                    DisplayController.setStatus(`🎉 ${currentPlayer.name} wins! 🎉`);
+                    gameActive = false;
+                    DisplayController.disableBoard();
+                    return;
+                }
+
+                if (checkTie()) {
+                    DisplayController.setStatus("🤝 Game ends in a tie! 🤝");
+                    gameActive = false;
+                    DisplayController.disableBoard();
+                    return;
+                }
+
+                switchPlayer();
+                DisplayController.setStatus(`${currentPlayer.name}'s turn (${currentPlayer.marker})`);
+                DisplayController.enableBoard();
+            } else {
+                console.log('AI move failed - position already taken or invalid'); // Debug log
+            }
+        } else {
+            console.log('AI returned null or undefined move'); // Debug log
         }
     };
 
     const makeMove = (position) => {
+        console.log('Attempting move at position:', position); // Debug log
+        console.log('Game state:', { 
+            isVsAI, 
+            currentPlayer: currentPlayer.name, 
+            gameActive 
+        });
+
         if (!gameActive) {
             DisplayController.setStatus("Game hasn't started! Click Start Game.");
             return;
@@ -319,10 +366,12 @@ const GameController = (() => {
 
         // If it's AI's turn, ignore player clicks
         if (isVsAI && currentPlayer === player2) {
+            console.log('Ignoring player click during AI turn'); // Debug log
             return;
         }
 
         if (Gameboard.updateBoard(position, currentPlayer.marker)) {
+            console.log('Move successful, updating board'); // Debug log
             DisplayController.updateBoard();
 
             const winningPattern = getWinningPattern();
@@ -346,14 +395,12 @@ const GameController = (() => {
 
             // If it's AI's turn, make AI move after a short delay
             if (isVsAI && currentPlayer === player2 && gameActive) {
+                console.log('Preparing AI move...'); // Debug log
                 DisplayController.disableBoard();
-                setTimeout(() => {
-                    makeAIMove();
-                    if (gameActive) {
-                        DisplayController.enableBoard();
-                    }
-                }, 500);
+                setTimeout(makeAIMove, 500);
             }
+        } else {
+            console.log('Move failed - position already taken or invalid'); // Debug log
         }
     };
 
