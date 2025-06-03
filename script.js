@@ -417,10 +417,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set initial active difficulty button
     document.querySelector('[data-difficulty="medium"]').classList.add('active');
 });
-
-// Print instructions when the script loads
-// console.log("Welcome to Tic Tac Toe!");
-// console.log("To start a new game, type: GameController.initialize('Player1', 'Player2')");
-// console.log("To make a move, type: GameController.makeMove(position) where position is 0-8");
-// console.log("Board positions are numbered like this:");
-// console.log("\n 0 | 1 | 2 \n---+---+---\n 3 | 4 | 5 \n---+---+---\n 6 | 7 | 8 \n");
