@@ -30,7 +30,7 @@ A modern, responsive implementation of the classic Tic Tac Toe game with AI oppo
 
 ## 🚀 Live Demo
 
-[Play the game here](https://bit2swaz.github.io/tic-tac-toe) <!-- Add your deployment link -->
+[Play the game here](https://bit2swaz.github.io/tic-tac-toe)
 
 ## 🛠️ Installation
 
