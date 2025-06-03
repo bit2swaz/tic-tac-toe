@@ -34,8 +34,16 @@ const DisplayController = (() => {
     const updateBoard = () => {
         const board = Gameboard.getBoard();
         cells.forEach((cell, index) => {
-            cell.textContent = board[index];
-            cell.className = 'cell' + (board[index] ? ` ${board[index].toLowerCase()}` : '');
+            // Remove previous classes
+            cell.className = 'cell';
+            
+            // Add marker class if exists
+            if (board[index]) {
+                cell.textContent = board[index];
+                cell.classList.add(board[index].toLowerCase());
+            } else {
+                cell.textContent = '';
+            }
         });
     };
 
@@ -57,6 +65,18 @@ const DisplayController = (() => {
         });
     };
 
+    const highlightWinningCells = (winningPattern) => {
+        winningPattern.forEach(index => {
+            cells[index].classList.add('win');
+        });
+    };
+
+    const clearHighlights = () => {
+        cells.forEach(cell => {
+            cell.classList.remove('win');
+        });
+    };
+
     const bindEvents = () => {
         cells.forEach(cell => {
             cell.addEventListener('click', () => {
@@ -66,10 +86,12 @@ const DisplayController = (() => {
         });
 
         startButton.addEventListener('click', () => {
+            clearHighlights();
             GameController.initialize(player1Input.value, player2Input.value);
         });
 
         restartButton.addEventListener('click', () => {
+            clearHighlights();
             GameController.initialize(player1Input.value, player2Input.value);
         });
     };
@@ -79,7 +101,8 @@ const DisplayController = (() => {
         setStatus,
         enableBoard,
         disableBoard,
-        bindEvents
+        bindEvents,
+        highlightWinningCells
     };
 })();
 
@@ -91,8 +114,8 @@ const GameController = (() => {
     let gameActive = false;
 
     const initialize = (p1Name = "Player 1", p2Name = "Player 2") => {
-        player1 = Player(p1Name, "X");
-        player2 = Player(p2Name, "O");
+        player1 = Player(p1Name || "Player 1", "X");
+        player2 = Player(p2Name || "Player 2", "O");
         currentPlayer = player1;
         gameActive = true;
         Gameboard.resetBoard();
@@ -105,7 +128,7 @@ const GameController = (() => {
         currentPlayer = currentPlayer === player1 ? player2 : player1;
     };
 
-    const checkWin = () => {
+    const getWinningPattern = () => {
         const board = Gameboard.getBoard();
         const winPatterns = [
             [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
@@ -113,12 +136,17 @@ const GameController = (() => {
             [0, 4, 8], [2, 4, 6]             // Diagonals
         ];
 
-        return winPatterns.some(pattern => {
+        for (let pattern of winPatterns) {
             const [a, b, c] = pattern;
-            return board[a] && 
-                   board[a] === board[b] && 
-                   board[a] === board[c];
-        });
+            if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                return pattern;
+            }
+        }
+        return null;
+    };
+
+    const checkWin = () => {
+        return getWinningPattern() !== null;
     };
 
     const checkTie = () => {
@@ -134,15 +162,17 @@ const GameController = (() => {
         if (Gameboard.updateBoard(position, currentPlayer.marker)) {
             DisplayController.updateBoard();
 
-            if (checkWin()) {
-                DisplayController.setStatus(`${currentPlayer.name} wins!`);
+            const winningPattern = getWinningPattern();
+            if (winningPattern) {
+                DisplayController.highlightWinningCells(winningPattern);
+                DisplayController.setStatus(`🎉 ${currentPlayer.name} wins! 🎉`);
                 gameActive = false;
                 DisplayController.disableBoard();
                 return;
             }
 
             if (checkTie()) {
-                DisplayController.setStatus("Game ends in a tie!");
+                DisplayController.setStatus("🤝 Game ends in a tie! 🤝");
                 gameActive = false;
                 DisplayController.disableBoard();
                 return;
