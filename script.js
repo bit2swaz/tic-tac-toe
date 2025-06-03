@@ -22,8 +22,69 @@ const Player = (name, marker) => {
     return { name, marker };
 };
 
+// Display Controller Module
+const DisplayController = (() => {
+    const statusDisplay = document.getElementById('status-display');
+    const cells = document.querySelectorAll('.cell');
+    const startButton = document.getElementById('start-game');
+    const restartButton = document.getElementById('restart-game');
+    const player1Input = document.getElementById('player1');
+    const player2Input = document.getElementById('player2');
+
+    const updateBoard = () => {
+        const board = Gameboard.getBoard();
+        cells.forEach((cell, index) => {
+            cell.textContent = board[index];
+            cell.className = 'cell' + (board[index] ? ` ${board[index].toLowerCase()}` : '');
+        });
+    };
+
+    const setStatus = (message) => {
+        statusDisplay.textContent = message;
+    };
+
+    const enableBoard = () => {
+        cells.forEach(cell => {
+            cell.style.cursor = 'pointer';
+            cell.classList.remove('disabled');
+        });
+    };
+
+    const disableBoard = () => {
+        cells.forEach(cell => {
+            cell.style.cursor = 'not-allowed';
+            cell.classList.add('disabled');
+        });
+    };
+
+    const bindEvents = () => {
+        cells.forEach(cell => {
+            cell.addEventListener('click', () => {
+                const index = cell.getAttribute('data-index');
+                GameController.makeMove(parseInt(index));
+            });
+        });
+
+        startButton.addEventListener('click', () => {
+            GameController.initialize(player1Input.value, player2Input.value);
+        });
+
+        restartButton.addEventListener('click', () => {
+            GameController.initialize(player1Input.value, player2Input.value);
+        });
+    };
+
+    return {
+        updateBoard,
+        setStatus,
+        enableBoard,
+        disableBoard,
+        bindEvents
+    };
+})();
+
 // Game Controller Module
-window.GameController = (() => {
+const GameController = (() => {
     let player1;
     let player2;
     let currentPlayer;
@@ -35,8 +96,9 @@ window.GameController = (() => {
         currentPlayer = player1;
         gameActive = true;
         Gameboard.resetBoard();
-        console.log("Game started! Current board:");
-        printBoard();
+        DisplayController.updateBoard();
+        DisplayController.enableBoard();
+        DisplayController.setStatus(`${currentPlayer.name}'s turn (${currentPlayer.marker})`);
     };
 
     const switchPlayer = () => {
@@ -65,52 +127,43 @@ window.GameController = (() => {
 
     const makeMove = (position) => {
         if (!gameActive) {
-            console.log("Game hasn't started! Call initialize() first.");
+            DisplayController.setStatus("Game hasn't started! Click Start Game.");
             return;
         }
 
         if (Gameboard.updateBoard(position, currentPlayer.marker)) {
-            console.log(`${currentPlayer.name} placed ${currentPlayer.marker} at position ${position}`);
-            printBoard();
+            DisplayController.updateBoard();
 
             if (checkWin()) {
-                console.log(`${currentPlayer.name} wins!`);
+                DisplayController.setStatus(`${currentPlayer.name} wins!`);
                 gameActive = false;
+                DisplayController.disableBoard();
                 return;
             }
 
             if (checkTie()) {
-                console.log("Game ends in a tie!");
+                DisplayController.setStatus("Game ends in a tie!");
                 gameActive = false;
+                DisplayController.disableBoard();
                 return;
             }
 
             switchPlayer();
-            console.log(`${currentPlayer.name}'s turn (${currentPlayer.marker})`);
-        } else {
-            console.log("Invalid move! Try again.");
+            DisplayController.setStatus(`${currentPlayer.name}'s turn (${currentPlayer.marker})`);
         }
     };
 
-    const printBoard = () => {
-        const board = Gameboard.getBoard();
-        console.log('\n' +
-            ' ' + (board[0] || ' ') + ' | ' + (board[1] || ' ') + ' | ' + (board[2] || ' ') + '\n' +
-            '---+---+---\n' +
-            ' ' + (board[3] || ' ') + ' | ' + (board[4] || ' ') + ' | ' + (board[5] || ' ') + '\n' +
-            '---+---+---\n' +
-            ' ' + (board[6] || ' ') + ' | ' + (board[7] || ' ') + ' | ' + (board[8] || ' ') + '\n'
-        );
-    };
-
-    const getCurrentPlayer = () => currentPlayer;
-
     return {
         initialize,
-        makeMove,
-        getCurrentPlayer
+        makeMove
     };
 })();
+
+// Initialize the game
+document.addEventListener('DOMContentLoaded', () => {
+    DisplayController.bindEvents();
+    DisplayController.disableBoard();
+});
 
 // Print instructions when the script loads
 console.log("Welcome to Tic Tac Toe!");
